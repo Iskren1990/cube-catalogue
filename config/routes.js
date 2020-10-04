@@ -1,8 +1,9 @@
 // TODO: Require Controllers...
 const {
     home,
-    getOneCube,
+    details,
     createCube,
+    getAttachAccessory,
     updateCube
 } = require("../controllers/cube");
 
@@ -14,17 +15,21 @@ module.exports = (app) => {
     // TODO...
     app.get("/", home);
     app.get("/home", home);
-    app.get("/about", function (req, res) { res.render("about") });
-    app.get("/create", createCube);
-    app.post("/create/cube", function (req, res) { console.log("postCreate"); res.redirect("/") });
-    app.get("/add-accessory", function (req, res) { res.render("createAccessory") });
+
+    app.get("/about", function (req, res) { res.render("about", {title: "About Page"}) });
+
+    app.get("/create", function (req, res) { res.render("create", {title: "Create Cube Page"}) });
+    app.post("/create/cube", createCube);
+
+    app.get("/add-accessory", function (req, res) { res.render("createAccessory", {title: "Create Accessory"}) });
     app.post("/create/accessory", createAccessory);
-    app.get("/details/:id", function (req, res) { res.render("details") });
 
-    app.get("/attach-accessory", function (req, res) { res.render("attachAccessory") });
-    app.post("/attach-accessory", function (req, res) { console.log("postAttachAccessory"); res.redirect("/") });
+    app.get("/details/:id", details);
 
-    app.post("/search", function (req, res) { console.log("postSearch"); res.redirect("/") });
+    app.get("/attach-accessory/:id", getAttachAccessory);
+    app.post("/attach-accessory/:id", updateCube);
 
-    app.use("*", function (req, res) { res.render("404") });
+    app.post("/search", home);
+
+    app.use("*", function (req, res) { res.render("404", {title: "Page Not Found"}) });
 };
