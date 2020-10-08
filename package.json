@@ -5,7 +5,8 @@
     "version": "1.0.0",
     "main": "pathToMain",
     "scripts": {
-        "start": "nodemon"
+        "start": "node index",
+        "startn": "nodemon"
     },
     "dependencies": {
         "express": "^4.17.1",
