@@ -5,10 +5,10 @@ const accessory = require("../models/accessoryModel");
 async function home(req, res) {
 
 
-    const { from, to , search } = req.body;
+    const { from, to, search } = req.body;
 
     const searchOptions = req.path === "/search" ?
-        { difficulty: { $lte: to || 6, $gte: from || 0}, name: { $regex: search || "", $options: 'i' } } :
+        { difficulty: { $lte: to || 6, $gte: from || 0 }, name: { $regex: search || "", $options: 'i' } } :
         {};
 
     console.log(searchOptions);
