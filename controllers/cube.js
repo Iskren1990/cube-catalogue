@@ -11,9 +11,8 @@ async function home(req, res) {
         { difficulty: { $lte: to || 6, $gte: from || 0 }, name: { $regex: search || "", $options: 'i' } } :
         {};
 
-    console.log(searchOptions);
     const allCubes = await cube.find(searchOptions).lean();
-    console.log(allCubes);
+
     res.render("index", { allCubes, title: "Cubicle" });
 }
 
@@ -21,7 +20,7 @@ async function details(req, res) {
 
     const cubeId = req.params.id;
     const chosenCube = await cube.findById(cubeId).populate("accessories").lean();
-    console.log(chosenCube);
+
     res.render("details", { title: "Cubicle", chosenCube });
 }
 
