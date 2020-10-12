@@ -125,6 +125,11 @@ div.details {
     padding: 1em;
 }
 
+div.btn-wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+
 span {
     font-weight: bolder;
     font-size: 17px;

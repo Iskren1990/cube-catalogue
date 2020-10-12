@@ -1,4 +1,4 @@
-const accessory = require("../models/accessoryModel");
+const accessory = require("../models/accessory-model");
 
 
 async function createAccessory(req, res) {

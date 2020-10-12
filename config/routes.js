@@ -4,7 +4,11 @@ const {
     details,
     createCube,
     getAttachAccessory,
-    updateCube
+    updateCube,
+    editCubePage,
+    editCubePost,
+    deleteCubePage,
+    deleteCubePost
 } = require("../controllers/cube");
 
 const {
@@ -13,7 +17,9 @@ const {
 
 const {
     loginPage,
+    loginUser,
     registerPage,
+    registerUser,
     logoutUser
 } = require("../controllers/user");
 
@@ -28,7 +34,7 @@ module.exports = (app) => {
     app.get("/create", function (req, res) { res.render("create", { title: "Create Cube Page" }) });
     app.post("/create/cube", createCube);
 
-    app.get("/add-accessory", function (req, res) { res.render("createAccessory", { title: "Create Accessory" }) });
+    app.get("/add-accessory", function (req, res) { res.render("create-accessory", { title: "Create Accessory" }) });
     app.post("/create/accessory", createAccessory);
 
     app.get("/details/:id", details);
@@ -37,13 +43,19 @@ module.exports = (app) => {
     app.post("/attach-accessory/:id", updateCube);
 
     app.get("/login", loginPage);
-    app.post("/login");
+    app.post("/login", loginUser);
 
     app.get("/logout", logoutUser);
 
 
     app.get("/register", registerPage);
-    app.post("/register");
+    app.post("/register", registerUser);
+
+    app.get("/edit/:id", editCubePage);
+    app.post("/edit/:id", editCubePost);
+
+    app.get("/delete/:id", deleteCubePage);
+    app.post("/delete/:id", deleteCubePost);
 
     app.post("/search", home);
 

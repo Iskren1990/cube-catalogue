@@ -1,5 +1,9 @@
-const cube = require("../models/cubeModel");
-const accessory = require("../models/accessoryModel");
+const cube = require("../models/cube-model");
+const accessory = require("../models/accessory-model");
+
+
+
+console.log("Refactor unnecessary code in cube.js");
 
 
 async function home(req, res) {
@@ -39,7 +43,7 @@ async function getAttachAccessory(req, res) {
     const chosenCube = await cube.findById(cubeId).lean();
     const nonAddedAccessories = await accessory.find({ "_id": { $nin: chosenCube.accessories } }).lean();
 
-    res.render("attachAccessory", { title: "Attach Accessory", chosenCube, nonAddedAccessories });
+    res.render("attach-accessory", { title: "Attach Accessory", chosenCube, nonAddedAccessories });
 }
 
 async function updateCube(req, res) {
@@ -68,11 +72,55 @@ async function updateCube(req, res) {
     res.redirect(`/attach-accessory/${cubeId}`);
 }
 
+async function editCubePage (req, res) {
+
+    const cubeId = req.params.id;
+    const chosenCube = await cube.findById(cubeId).populate("accessories").lean();
+
+    res.render("edit-cube-page", { title: "Cubicle", ...chosenCube });
+
+}
+
+async function editCubePost (req, res) {
+
+    const cubeId = req.params.id;
+    const { name, description, imageURL, difficulty } = req.body;
+    console.log(req.body);
+    await cube.findByIdAndUpdate(
+        cubeId,
+        { name, description, imageURL, difficulty },
+        function (err, suc) { console.log(err); }
+    );
+
+    res.redirect(`/details/${cubeId}`);
+}
+
+async function deleteCubePage(req, res) {
+
+    const cubeId = req.params.id;
+    const chosenCube = await cube.findById(cubeId).populate("accessories").lean();
+
+    res.render("delete-cube-page", { title: "Cubicle", ...chosenCube })
+}
+
+async function deleteCubePost(req, res) {
+
+    const cubeId = req.params.id;
+
+    cube.deleteOne({_id: cubeId}, function(err) { if (err) { res.redirect(`/delete/${cubeId}`)}});
+    
+    res.redirect("/");
+
+}
 
 module.exports = {
     home,
     details,
     createCube,
+    editCubePage,
+    editCubePost,
     getAttachAccessory,
-    updateCube
+    updateCube,
+    deleteCubePage,
+    deleteCubePost
 }
