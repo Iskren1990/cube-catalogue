@@ -21,11 +21,12 @@ const cubeSchema = new mongoose.Schema({
         max: 6
     },
     creatorId: {
-        type: String,
-        required: true
+        type: "ObjectID",
+        required: true,
+        ref: "User"
     },
     accessories: [{
-        type: "ObjectId",
+        type: "ObjectID",
         ref: "Accessory"
     }]
 });
