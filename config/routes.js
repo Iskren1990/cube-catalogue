@@ -23,41 +23,54 @@ const {
     logoutUser
 } = require("../controllers/user");
 
+const {
+    authCheck,
+    guestCheck,
+    userStatus
+} = require("../controllers/middleware");
 
 module.exports = (app) => {
-    // TODO...
-    app.get("/", home);
-    app.get("/home", home);
 
-    app.get("/about", function (req, res) { res.render("about", { title: "About Page" }) });
+    app.get("/", userStatus, home);
+    app.get("/home", userStatus, home);
 
-    app.get("/create", function (req, res) { res.render("create", { title: "Create Cube Page" }) });
-    app.post("/create/cube", createCube);
+    app.get("/about", userStatus, function (req, res) {
+        res.render("about", { title: "About Page", user: req.user })
+    });
 
-    app.get("/add-accessory", function (req, res) { res.render("create-accessory", { title: "Create Accessory" }) });
-    app.post("/create/accessory", createAccessory);
+    app.get("/create", authCheck, userStatus, function (req, res) {
+        res.render("create", { title: "Create Cube Page", user: req.user })
+    });
+    app.post("/create/cube", authCheck, userStatus, createCube);
 
-    app.get("/details/:id", details);
+    app.get("/add-accessory", authCheck, userStatus, function (req, res) {
+        res.render("create-accessory", { title: "Create Accessory", user: req.user })
+    });
+    app.post("/create/accessory", authCheck, userStatus, createAccessory);
 
-    app.get("/attach-accessory/:id", getAttachAccessory);
-    app.post("/attach-accessory/:id", updateCube);
+    app.get("/details/:id", userStatus, details);
 
-    app.get("/login", loginPage);
-    app.post("/login", loginUser);
+    app.get("/attach-accessory/:id", authCheck, userStatus, getAttachAccessory);
+    app.post("/attach-accessory/:id", authCheck, userStatus, updateCube);
 
-    app.get("/logout", logoutUser);
+    app.get("/login", guestCheck, userStatus, loginPage);
+    app.post("/login", guestCheck, userStatus, loginUser);
+
+    app.get("/logout", userStatus, logoutUser);
 
 
-    app.get("/register", registerPage);
-    app.post("/register", registerUser);
+    app.get("/register", guestCheck, userStatus, registerPage);
+    app.post("/register", guestCheck, userStatus, registerUser);
 
-    app.get("/edit/:id", editCubePage);
-    app.post("/edit/:id", editCubePost);
+    app.get("/edit/:id", authCheck, userStatus, editCubePage);
+    app.post("/edit/:id", authCheck, userStatus, editCubePost);
 
-    app.get("/delete/:id", deleteCubePage);
-    app.post("/delete/:id", deleteCubePost);
+    app.get("/delete/:id", authCheck, userStatus, deleteCubePage);
+    app.post("/delete/:id", authCheck, userStatus, deleteCubePost);
 
-    app.post("/search", home);
+    app.post("/search", userStatus, home);
 
-    app.use("*", function (req, res) { res.render("404", { title: "Page Not Found" }) });
+    app.use("*", userStatus, function (req, res) {
+        res.render("404", { title: "Page Not Found", user: req.user })
+    });
 };
