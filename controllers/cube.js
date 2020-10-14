@@ -10,7 +10,7 @@ console.log("Refactor unnecessary code in cube.js");
 async function home(req, res) {
 
     const { from, to, search } = req.body;
-
+    
     const searchOptions = req.path === "/search" ?
         { difficulty: { $lte: to || 6, $gte: from || 0 }, name: { $regex: search || "", $options: 'i' } } :
         {};
@@ -39,7 +39,7 @@ async function createCube(req, res) {
 }
 
 async function getAttachAccessory(req, res) {
-    
+
     const cubeId = req.params.id;
     const chosenCube = await cube.findById(cubeId).lean();
     const nonAddedAccessories = await accessory.find({ "_id": { $nin: chosenCube.accessories } }).lean();
