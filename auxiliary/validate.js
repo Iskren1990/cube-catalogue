@@ -4,6 +4,4 @@ function validatePasswords(pass, rePass) {
 
 
 
-module.exports = {
-    validatePasswords,
-}
+module.exports = validatePasswords;
