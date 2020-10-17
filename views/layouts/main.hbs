@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Cubicle</title>
+  <title>{{title}}</title>
   <link href="/css/site.css" type="text/css" rel="stylesheet">
   <link rel='shortcut icon' type='image/x-icon' href='/images/favicon.png' />
 </head>
@@ -11,9 +11,9 @@
 <body>
   <div class="container">
       {{> header}}
-      <div id="notifications">
-        <paragraph id="notification-message">{{error}}</paragraph>
-      </div>
+      {{#if error}}
+      {{> notifications}}
+      {{/if}}
     <main>
       {{{ body }}}
     </main>

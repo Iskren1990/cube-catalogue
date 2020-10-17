@@ -4,11 +4,15 @@ const cubeSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
+        minlength: 5,
+        match: /[0-9a-zA-Z\s]+/
     },
     description: {
         type: String,
         required: true,
-        maxlength: 500
+        minlength: 20,
+        maxlength: 500,
+        match: /[0-9a-zA-Z\s]+/
     },
     imageURL: {
         type: String,
