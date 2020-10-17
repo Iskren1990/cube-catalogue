@@ -26,8 +26,14 @@ const {
 const {
     authCheck,
     guestCheck,
-    userStatus
+    userStatus,
+    validationErrorHandler
 } = require("../controllers/middleware");
+
+const {
+    validatePasswordsMatch,
+    validatePassword,
+} = require("../auxiliary/validate");
 
 module.exports = (app) => {
 
@@ -60,7 +66,7 @@ module.exports = (app) => {
 
 
     app.get("/register", guestCheck, userStatus, registerPage);
-    app.post("/register", guestCheck, userStatus, registerUser);
+    app.post("/register", guestCheck, userStatus, validatePasswordsMatch, validatePassword, validationErrorHandler, registerUser);
 
     app.get("/edit/:id", authCheck, userStatus, editCubePage);
     app.post("/edit/:id", authCheck, userStatus, editCubePost);

@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const key = require("../config/config").key;
+const { validationResult } = require("express-validator");
 
 function authCheck(req, res, next) {
     const token = req.cookies.uid;
@@ -48,8 +49,18 @@ function userStatus(req, res, next) {
     next();
 }
 
+function validationErrorHandler(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        next(errors);
+        return;
+    }
+    next();
+}
+
 module.exports = {
     authCheck,
     guestCheck,
-    userStatus
+    userStatus,
+    validationErrorHandler
 }
