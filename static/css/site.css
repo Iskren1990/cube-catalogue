@@ -53,6 +53,16 @@ header ul li a:hover {
     text-decoration: underline;
 }
 
+#notifications {
+    margin: 0 auto;
+    margin-top: 5px;
+    margin-bottom: 0px;
+    text-align: center;
+    width: 50%;
+    background: rgb(231, 118, 118);
+    padding: 0.5em;
+}
+
 main {
     margin: 0 4em;
     border-radius: 15px;
