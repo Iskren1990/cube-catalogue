@@ -1,4 +1,7 @@
 const mongoose = require("mongoose");
+const { validateUrl } = require("../auxiliary/validate");
+const { urlValidationError } = require("../error-messages");
+
 
 const accessorySchema = new mongoose.Schema({
     name: {
@@ -24,8 +27,6 @@ const accessorySchema = new mongoose.Schema({
     }]
 });
 
-accessorySchema.path('imageURL').validate(function(url) {
-    return url.startsWith('http://') || url.startsWith('https://')
-  }, 'Image url is not valid');
+accessorySchema.path('imageURL').validate(validateUrl, urlValidationError);
 
 module.exports = mongoose.model("Accessory", accessorySchema);

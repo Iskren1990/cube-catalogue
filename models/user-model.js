@@ -11,6 +11,8 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
+        minlength: [5, "Minimum number of password characters is 5"],
+        match: [/[A-Za-z0-9]+/, "Password should have only latin characters and numbers"],
     }
 });
 
