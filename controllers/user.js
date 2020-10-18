@@ -5,7 +5,7 @@ const key = require("../config/config").key;
 
 
 function loginPage(req, res) {
-    res.render("login-page", { title: "Login Page", user: req.user });
+    res.render("login-page", { title: "Login Page", ...req.user });
 }
 
 async function loginUser(req, res) {
@@ -25,7 +25,7 @@ async function loginUser(req, res) {
         res.render("login-page", {
             title: "Login Page",
             error: [{ msg: "Wrong Username or password" }],
-            user: req.user
+            ...req.user
         });
     }
 }
@@ -61,7 +61,7 @@ async function registerUser(req, res) {
             title: "Register Page",
             username,
             error,
-            user: req.user
+            ...req.user
         });
 
     }

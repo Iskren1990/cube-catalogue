@@ -9,7 +9,7 @@ async function createAccessory(req, res) {
 
         res.redirect("/add-accessory");
     } catch (err) {
-        res.render("create-accessory", { ...req.body, error, user: req.user });
+        res.render("create-accessory", { ...req.body, error, ...req.user });
     }
 
 }
