@@ -6,9 +6,7 @@ const commonError = require("../error-messages").schemaValidationError;
 
 
 async function home(req, res) {
-
     const { from, to, search } = req.body;
-
     const searchOptions = req.path === "/search" ?
         { difficulty: { $lte: to || 6, $gte: from || 0 }, name: { $regex: search || "", $options: 'i' } } :
         {};
@@ -23,7 +21,7 @@ async function details(req, res) {
     const chosenCube = await cube.findById(cubeId).populate("accessories").lean();
     const isOwner = chosenCube.creatorId == req.user.id;
 
-    res.render("details", { title: "Cubicle", chosenCube, user: req.user, isOwner });
+    res.render("details", { title: "Cubicle", chosenCube, ...req.user, isOwner });
 }
 
 async function createCube(req, res) {
