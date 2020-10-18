@@ -6,7 +6,6 @@ const key = require("../config/config").key;
 
 function loginPage(req, res) {
     res.render("login-page", { title: "Login Page", user: req.user });
-
 }
 
 async function loginUser(req, res) {
@@ -43,7 +42,6 @@ async function registerUser(req, res) {
     } = req.body;
 
     try {
-
         const salt = await bcrypt.genSalt(10);
         const hashedPwd = bcrypt.hashSync(password, salt);
         const { id } = await user.create({ username, password: hashedPwd });
@@ -51,11 +49,18 @@ async function registerUser(req, res) {
 
         res.cookie("uid", token).redirect("/");
 
-    } catch (error) {
+    } catch (err) {
+        const error = [];
+        if (!err.code) {
+            Object.entries(err.errors).forEach(message => error.push({msg: message[1]}));
+        } else {
+            error.push({ msg: "The username is already taken" });
+        }
+        
         res.render("register-page", {
             title: "Register Page",
             username,
-            error: [{ msg: "The username is already taken" }],
+            error,
             user: req.user
         });
 
@@ -64,11 +69,14 @@ async function registerUser(req, res) {
 }
 
 function logoutUser(req, res) {
-
     res.clearCookie("uid");
     res.redirect("/");
-
 }
+
+function genToken(credentials) {
+    return jwt.sign(credentials, key);
+}
+
 
 module.exports = {
     loginPage,
@@ -76,11 +84,4 @@ module.exports = {
     registerPage,
     registerUser,
     logoutUser
-}
-
-
-
-
-function genToken(credentials) {
-    return jwt.sign(credentials, key);
 }

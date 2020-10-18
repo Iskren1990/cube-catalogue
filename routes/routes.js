@@ -1,4 +1,3 @@
-// TODO: Require Controllers...
 const {
     home,
     details,
@@ -66,7 +65,13 @@ module.exports = (app) => {
 
 
     app.get("/register", guestCheck, userStatus, registerPage);
-    app.post("/register", guestCheck, userStatus, validatePasswordsMatch, validatePassword, validationErrorHandler, registerUser);
+    app.post("/register",
+        guestCheck,
+        userStatus,
+        validatePasswordsMatch,
+        validatePassword,
+        validationErrorHandler,
+        registerUser);
 
     app.get("/edit/:id", authCheck, userStatus, editCubePage);
     app.post("/edit/:id", authCheck, userStatus, editCubePost);

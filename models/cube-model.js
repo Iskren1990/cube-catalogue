@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const { validateUrl } = require("../auxiliary/validate");
+const { urlValidationError } = require("../error-messages");
 
 const cubeSchema = new mongoose.Schema({
     name: {
@@ -6,6 +8,7 @@ const cubeSchema = new mongoose.Schema({
         required: true,
         minlength: 5,
         match: /[0-9a-zA-Z\s]+/
+
     },
     description: {
         type: String,
@@ -35,8 +38,6 @@ const cubeSchema = new mongoose.Schema({
     }]
 });
 
-cubeSchema.path('imageURL').validate(function(url) {
-    return url.startsWith('http://') || url.startsWith('https://')
-  }, 'Image url is not valid');
+cubeSchema.path('imageURL').validate(validateUrl, urlValidationError);
 
 module.exports = mongoose.model("Cube", cubeSchema);

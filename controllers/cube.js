@@ -2,9 +2,7 @@ const cube = require("../models/cube-model");
 const accessory = require("../models/accessory-model");
 const jwt = require("jsonwebtoken");
 const key = require("../config/config").key;
-
-
-console.log("Refactor unnecessary code in cube.js");
+const commonError = require("../error-messages").schemaValidationError;
 
 
 async function home(req, res) {
@@ -21,34 +19,29 @@ async function home(req, res) {
 }
 
 async function details(req, res) {
-    console.log("VALIDATE USER IS OWNER OF THE CUBE IN CUBE.JS");
     const cubeId = req.params.id;
     const chosenCube = await cube.findById(cubeId).populate("accessories").lean();
-    // const isOwner = chosenCube.id === 
-    res.render("details", { title: "Cubicle", chosenCube, user: req.user });
+    const isOwner = chosenCube.creatorId == req.user.id;
+
+    res.render("details", { title: "Cubicle", chosenCube, user: req.user, isOwner });
 }
 
 async function createCube(req, res) {
     const creatorId = req.user.id
-
     const { name, description, imageURL, difficulty } = req.body;
-    try {
-        await cube.create({ name, description, imageURL, difficulty, creatorId });
-        res.render("create", { user: req.user });
-    } catch (error) {
-        error = [
-            { msg: "Name - At least 5 characters long, who could be English letters, digits and white spaces" },
-            { msg: "At least 20 characters, who could be English letters, digits and white spaces" },
-            { msg: "ImageUrl - Referring to actual picture" }
-        ]
-        res.render("create", { user: req.user, error })
-    }
 
-
+    await cube.create({ name, description, imageURL, difficulty, creatorId },
+        function (error) {
+            if (error) {
+                error = commonError;
+                res.render("create", { user: req.user, error, ...req.body })
+            } else {
+                res.render("create", { user: req.user });
+            }
+        });
 }
 
 async function getAttachAccessory(req, res) {
-
     const cubeId = req.params.id;
     const chosenCube = await cube.findById(cubeId).lean();
     const nonAddedAccessories = await accessory.find({ "_id": { $nin: chosenCube.accessories } }).lean();
@@ -56,81 +49,96 @@ async function getAttachAccessory(req, res) {
     res.render("attach-accessory", { title: "Attach Accessory", chosenCube, nonAddedAccessories, user: req.user });
 }
 
-async function updateCube(req, res) {
+async function updateCube(req, res, next) {
 
     const accessoryId = req.body.accessory;
     const cubeId = req.params.id;
 
-    try {
-
-        await cube.findByIdAndUpdate(
-            cubeId,
-            { $addToSet: { "accessories": accessoryId } },
-            function (err, suc) { console.log(err, suc); }
-        );
-
-        await accessory.findByIdAndUpdate(
-            accessoryId,
-            { $addToSet: { "cubes": cubeId } },
-            function (err, suc) { console.log(err, suc); }
-        );
-
-    } catch (error) {
-        console.log(error);
-    }
+    await cube.findOneAndUpdate(
+        { _id: cubeId },
+        { $addToSet: { "accessories": accessoryId } },
+        async function (err, suc) {
+            if (err) {
+                new Error("Something Went Wrong");
+                next(err);
+            } else {
+                await accessory.findByIdAndUpdate(
+                    accessoryId,
+                    { $addToSet: { "cubes": cubeId } },
+                    function (err, suc) {
+                        if (err) {
+                            new Error("Something Went Wrong");
+                            next(err);
+                        }
+                    }
+                );
+            }
+        }
+    );
 
     res.redirect(`/attach-accessory/${cubeId}`);
 }
 
 async function editCubePage(req, res) {
-
+    const userId = req.user.id;
     const cubeId = req.params.id;
     const chosenCube = await cube.findById(cubeId).populate("accessories").lean();
 
-    res.render("edit-cube-page", { title: "Cubicle", ...chosenCube, user: req.user });
+    if (chosenCube.creatorId != userId) {
+        res.redirect("/");
+        return;
+    }
 
+    res.render("edit-cube-page", { title: "Cubicle", ...chosenCube, user: req.user });
 }
 
 async function editCubePost(req, res) {
-
     const cubeId = req.params.id;
     const { name, description, imageURL, difficulty } = req.body;
-    try {
-        await cube.findByIdAndUpdate(
-            cubeId,
-            { name, description, imageURL, difficulty },
-            { runValidators: true },
-            function (err, suc) { console.log(err); }
-        );
 
-        res.redirect(`/details/${cubeId}`);
-    } catch (error) {
-        error = [
-            { msg: "Name - At least 5 characters long, who could be English letters, digits and white spaces" },
-            { msg: "At least 20 characters, who could be English letters, digits and white spaces" },
-            { msg: "ImageUrl - Referring to actual picture" }
-        ]
-        res.render(`edit-cube-page`, { user: req.user, error, ...req.body })
-    }
+    await cube.findOneAndUpdate(
+        { _id: cubeId, creatorId: req.user.id },
+        { name, description, imageURL, difficulty },
+        { runValidators: true },
+        function errorHandler(error, suc) {
+            error = commonError;
+            res.render(`edit-cube-page`, {
+                user: req.user,
+                error,
+                _id: req.params.id,
+                ...req.body
+            });
+        }
+    );
 
+    res.redirect(`/details/${cubeId}`);
 }
 
 async function deleteCubePage(req, res) {
-
     const cubeId = req.params.id;
-    const chosenCube = await cube.findById(cubeId).populate("accessories").lean();
+    const chosenCube = await cube.findById(cubeId)
+        .populate("accessories")
+        .lean();
+
+    if (chosenCube.creatorId != userId) {
+        res.redirect("/");
+        return;
+    }
 
     res.render("delete-cube-page", { title: "Cubicle", ...chosenCube, user: req.user })
 }
 
 async function deleteCubePost(req, res) {
-
     const cubeId = req.params.id;
 
-    cube.deleteOne({ _id: cubeId }, function (err) { if (err) { res.redirect(`/delete/${cubeId}`) } });
-
-    res.redirect("/");
-
+    cube.deleteOne({ _id: cubeId, creatorId: req.user.id },
+        function (err) {
+            if (err) {
+                res.redirect(`/delete/${cubeId}`);
+            } else {
+                res.redirect("/");
+            }
+        });
 }
 
 module.exports = {

@@ -6,7 +6,7 @@ const globalErrorHandler = require("./auxiliary/global-error-handler");
 
 require("./config/data")(config);
 require('./config/express')(app);
-require('./config/routes')(app);
+require('./routes/routes')(app);
 
 app.use(globalErrorHandler);
 
