@@ -6,10 +6,10 @@
     <div class="btn-wrapper">
         <a class="btn" href="/">Back</a>
         {{#if isLogged}}
-        {{#if isOwner}}
-        <a class="btn" href="/edit/{{chosenCube._id}}">Edit</a>
-        <a class="btn" href="/delete/{{chosenCube._id}}">Delete</a>
-        {{/if}}
+            {{#if isOwner}}
+            <a class="btn" href="/edit/{{chosenCube._id}}">Edit</a>
+            <a class="btn" href="/delete/{{chosenCube._id}}">Delete</a>
+            {{/if}}
         <a class="btn" href="/attach-accessory/{{chosenCube._id}}">Attach Accessory</a>
         {{/if}}
     </div>
