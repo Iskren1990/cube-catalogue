@@ -13,7 +13,7 @@ async function home(req, res) {
 
     const allCubes = await cube.find(searchOptions).lean();
 
-    res.render("index", { allCubes, title: "Cubicle", user: req.user });
+    res.render("index", { allCubes, title: "Cubicle", ...req.user });
 }
 
 async function details(req, res) {
@@ -32,9 +32,9 @@ async function createCube(req, res) {
         function (error) {
             if (error) {
                 error = commonError;
-                res.render("create", { user: req.user, error, ...req.body })
+                res.render("create", { ...req.user, error, ...req.body })
             } else {
-                res.render("create", { user: req.user });
+                res.render("create", { ...req.user });
             }
         });
 }
@@ -44,7 +44,7 @@ async function getAttachAccessory(req, res) {
     const chosenCube = await cube.findById(cubeId).lean();
     const nonAddedAccessories = await accessory.find({ "_id": { $nin: chosenCube.accessories } }).lean();
 
-    res.render("attach-accessory", { title: "Attach Accessory", chosenCube, nonAddedAccessories, user: req.user });
+    res.render("attach-accessory", { title: "Attach Accessory", chosenCube, nonAddedAccessories, ...req.user });
 }
 
 async function updateCube(req, res, next) {
@@ -87,7 +87,7 @@ async function editCubePage(req, res) {
         return;
     }
 
-    res.render("edit-cube-page", { title: "Cubicle", ...chosenCube, user: req.user });
+    res.render("edit-cube-page", { title: "Cubicle", ...chosenCube, ...req.user });
 }
 
 async function editCubePost(req, res) {
@@ -99,17 +99,19 @@ async function editCubePost(req, res) {
         { name, description, imageURL, difficulty },
         { runValidators: true },
         function errorHandler(error, suc) {
-            error = commonError;
-            res.render(`edit-cube-page`, {
-                user: req.user,
-                error,
-                _id: req.params.id,
-                ...req.body
-            });
+            if (error) {
+                error = commonError;
+                res.render(`edit-cube-page`, {
+                    ...req.user,
+                    error,
+                    _id: req.params.id,
+                    ...req.body
+                });
+            } else {
+                res.redirect(`/details/${cubeId}`);
+            }
         }
     );
-
-    res.redirect(`/details/${cubeId}`);
 }
 
 async function deleteCubePage(req, res) {
@@ -118,12 +120,12 @@ async function deleteCubePage(req, res) {
         .populate("accessories")
         .lean();
 
-    if (chosenCube.creatorId != userId) {
+    if (chosenCube.creatorId != req.user.id) {
         res.redirect("/");
         return;
     }
 
-    res.render("delete-cube-page", { title: "Cubicle", ...chosenCube, user: req.user })
+    res.render("delete-cube-page", { title: "Cubicle", ...chosenCube, ...req.user })
 }
 
 async function deleteCubePost(req, res) {

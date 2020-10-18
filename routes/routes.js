@@ -40,16 +40,16 @@ module.exports = (app) => {
     app.get("/home", userStatus, home);
 
     app.get("/about", userStatus, function (req, res) {
-        res.render("about", { title: "About Page", user: req.user })
+        res.render("about", { title: "About Page", ...req.user })
     });
 
     app.get("/create", authCheck, userStatus, function (req, res) {
-        res.render("create", { title: "Create Cube Page", user: req.user })
+        res.render("create", { title: "Create Cube Page", ...req.user })
     });
     app.post("/create/cube", authCheck, userStatus, createCube);
 
     app.get("/add-accessory", authCheck, userStatus, function (req, res) {
-        res.render("create-accessory", { title: "Create Accessory", user: req.user })
+        res.render("create-accessory", { title: "Create Accessory", ...req.user })
     });
     app.post("/create/accessory", authCheck, userStatus, createAccessory);
 
@@ -82,6 +82,6 @@ module.exports = (app) => {
     app.post("/search", userStatus, home);
 
     app.use("*", userStatus, function (req, res) {
-        res.render("404", { title: "Page Not Found", user: req.user })
+        res.render("404", { title: "Page Not Found", ...req.user })
     });
 };

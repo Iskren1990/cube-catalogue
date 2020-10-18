@@ -14,7 +14,7 @@ module.exports = function (err, req, res, next) {
         try {
             errObj[path](data);
         } catch (error) {
-            res.render("404", { title: "Error", user: req.user, error: [{ msg: "Something Went Wrong" }, { msg: "Excuse Us For The Inconvenience" }] });
+            res.render("404", { title: "Error", ...req.user, error: [{ msg: "Something Went Wrong" }, { msg: "Excuse Us For The Inconvenience" }] });
         }
     }
 }
