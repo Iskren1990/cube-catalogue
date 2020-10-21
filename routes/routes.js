@@ -27,7 +27,7 @@ const {
     guestCheck,
     userStatus,
     validationErrorHandler
-} = require("../controllers/middleware");
+} = require("../middlewares/middleware");
 
 const {
     validatePasswordsMatch,
